@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.10)
+
+# Название проекта
+project(labirint-game-oop2-siit-2024)
+
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+
+add_executable(labirint-game-oop2-siit-2024 src/main.cpp)
+
+include_directories(${CMAKE_SOURCE_DIR})
