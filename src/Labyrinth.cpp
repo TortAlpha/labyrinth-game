@@ -38,9 +38,7 @@ Labyrinth::Labyrinth(unsigned int w, unsigned int h)
     }
 
     std::cout << "Memory allocated.\n";
-
     generate();
-    print();
 }
 
 Labyrinth::~Labyrinth()
@@ -100,7 +98,7 @@ void Labyrinth::createSemicircle(unsigned int centerRow, unsigned int centerCol,
                         // Optionally skip 'U' or 'I' if you want them to remain literal.
                         // char currentVal = labyrinth[rr][cc].getVal();
                         // if (currentVal != 'U' && currentVal != 'I') ...
-                        labyrinth[rr][cc].setVal('.');
+                        labyrinth[rr][cc].setVal(' ');
                     }
                 }
                 // else for exit. 
@@ -108,7 +106,7 @@ void Labyrinth::createSemicircle(unsigned int centerRow, unsigned int centerCol,
                     // If topHalf=false, carve cells if rr <= centerRow
                     // so the row with 'I' remains intact.
                     if (rr <= static_cast<int>(centerRow)) {
-                        labyrinth[rr][cc].setVal('.');
+                        labyrinth[rr][cc].setVal(' ');
                     }
                 }
             }
@@ -180,7 +178,7 @@ bool Labyrinth::wallCondition()
 //
 void Labyrinth::generate()
 {
-    const unsigned int MAX_ATTEMPTS = 50;
+    const unsigned int MAX_ATTEMPTS = 100;
     bool success = false;
 
     for (unsigned int attempt = 1; attempt <= MAX_ATTEMPTS && !success; attempt++)
@@ -193,9 +191,10 @@ void Labyrinth::generate()
         }
 
         // Set 'U' and 'I' at random columns
-        unsigned int enterCol = 1 + randomInt((width > 2) ? (width - 2) : 1);
+        unsigned int enterCol = 1 + randomInt(width / 2 - 1);
         labyrinth[0][enterCol].setVal('U');
-        unsigned int exitCol = 1 + randomInt((width > 2) ? (width - 2) : 1);
+
+        unsigned int exitCol = width / 2 + randomInt(width / 2 - 1);
         labyrinth[height - 1][exitCol].setVal('I');
 
         // 1) Eller's-like generation in [1..height-2][1..width-2]
@@ -218,7 +217,7 @@ void Labyrinth::generate()
                 if (rr >= 1 && rr <= height - 2 &&
                     cc >= 1 && cc <= width - 2)
                 {
-                    labyrinth[rr][cc].setVal('.');
+                    labyrinth[rr][cc].setVal(' ');
                 }
             };
 
@@ -356,7 +355,19 @@ void Labyrinth::print()
 {
     for (unsigned int r = 0; r < height; r++) {
         for (unsigned int c = 0; c < width; c++) {
-            std::cout << labyrinth[r][c];
+            switch (labyrinth[r][c].getVal())
+            {
+            case 'U':
+                std::cout << termcolor::green << 'U' << termcolor::reset;
+                break;
+            case 'I':
+                std::cout << termcolor::on_green << 'I' << termcolor::reset;
+                break;
+            default:
+                std::cout << labyrinth[r][c];
+                break;
+            }
+            
         }
         std::cout << "\n";
     }
