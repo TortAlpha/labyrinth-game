@@ -6,6 +6,7 @@
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
+#include <list>
 #include <termcolor.hpp>
 
 // Returns an integer in [0..max-1]
@@ -38,7 +39,10 @@ Labyrinth::Labyrinth(unsigned int w, unsigned int h)
     }
 
     std::cout << "Memory allocated.\n";
-    generate();
+    mapGeneratedSuccessfully = generate();
+    if (mapGeneratedSuccessfully) {
+        pathFromEntranceToExit = findPathFromEntranceToExit();
+    }
 }
 
 Labyrinth::~Labyrinth()
@@ -176,7 +180,7 @@ bool Labyrinth::wallCondition()
 //
 // Main generation: 1) Eller's-like, 2) semicircles, 3) BFS
 //
-void Labyrinth::generate()
+bool Labyrinth::generate()
 {
     const unsigned int MAX_ATTEMPTS = 100;
     bool success = false;
@@ -196,6 +200,10 @@ void Labyrinth::generate()
 
         unsigned int exitCol = width / 2 + randomInt(width / 2 - 1);
         labyrinth[height - 1][exitCol].setVal('I');
+
+        // Set start point as the cell below 'U'
+        this->startPoint = labyrinth[0][enterCol];
+        this->endPoint = labyrinth[height - 1][exitCol];
 
         // 1) Eller's-like generation in [1..height-2][1..width-2]
         {
@@ -349,6 +357,17 @@ void Labyrinth::generate()
         std::cout << "Too many attempts, giving up.\n";
         std::cout << termcolor::red << "Labyrinth generation failed.\n" << termcolor::reset;
     }
+
+    // Find a path from 'U' to 'I' and store it in pathFromEntranceToExit
+    // for future use in Minotavr logic
+    //
+    // I could use the reversed path-generation in
+    // isPathExists() or in generate() above but
+    // I needed to be sure that the path is guaranteed,
+    // so I made another BFS function for that.
+    //
+    this->pathFromEntranceToExit = this->findPathFromEntranceToExit();
+    return success;
 }
 
 void Labyrinth::print()
@@ -362,6 +381,12 @@ void Labyrinth::print()
                 break;
             case 'I':
                 std::cout << termcolor::on_green << 'I' << termcolor::reset;
+                break;
+            case 'P':
+                std::cout << termcolor::on_bright_blue << 'P' << termcolor::reset;
+                break;
+            case 'M':
+                std::cout << termcolor::on_bright_red << 'M' << termcolor::reset;
                 break;
             default:
                 std::cout << labyrinth[r][c];
@@ -383,4 +408,109 @@ void Labyrinth::setCell(unsigned int row, unsigned int col, const Cell& cell)
 Cell& Labyrinth::getCell(unsigned int row, unsigned int col)
 {
     return labyrinth[row][col];
+}
+
+Cell Labyrinth::getStartPoint()
+{
+    return this->startPoint;
+}
+
+bool Labyrinth::getMapGenerationSuccess()
+{
+    return mapGeneratedSuccessfully;
+}
+
+//------------------------------------------------------------------------------
+// BFS: find a path from entrance 'U' to exit 'I'
+//------------------------------------------------------------------------------
+//
+// Since the labyrinth has been generated successfully, we can guarantee a path.
+// So we can use BFS to find a path from 'U' to 'I'.
+//
+std::list<Cell*> Labyrinth::findPathFromEntranceToExit()
+{
+    int startR = startPoint.getRow();
+    int startC = startPoint.getCol();
+    int endR = endPoint.getRow();
+    int endC = endPoint.getCol();
+
+    std::vector<std::vector<bool>> visited(height, std::vector<bool>(width, false));
+
+    // Parent array for path reconstruction
+    std::vector<std::vector<Cell*>> parent(
+        height,
+        std::vector<Cell*>(width, nullptr)
+    );
+
+    //
+    // I've decided to store pointers to Cell objects in the queue
+    // so in future I can easily reconstruct the path and store it in class.
+    //
+    Cell* startCell = &labyrinth[startR][startC];
+    Cell* endCell = &labyrinth[endR][endC];
+
+    std::queue<Cell*> q;
+
+    q.push(startCell);
+    visited[startR][startC] = true;
+
+    const int DR[4] = {-1, 1, 0, 0};
+    const int DC[4] = { 0, 0,-1, 1};
+
+    bool found = false;
+
+    // Basic BFS for pathfinding and filling the parent array
+    while (!q.empty())
+    {
+        Cell* current = q.front();
+        q.pop();
+
+        int curR = current->getRow();
+        int curC = current->getCol();
+
+        if (current == endCell) {
+            found = true;
+            break;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int nr = curR + DR[i];
+            int nc = curC + DC[i];
+
+            if (nr >= 0 && nr < (int)height &&
+                nc >= 0 && nc < (int)width &&
+                !visited[nr][nc] &&
+                labyrinth[nr][nc].getVal() != '#')
+            {
+                visited[nr][nc] = true;
+                parent[nr][nc] = current;
+                q.push(&labyrinth[nr][nc]);
+            }
+        }
+    }
+
+    // Here I reconstruct the path from 'U' to 'I' 
+    // using parent array made in BFS
+    std::list<Cell*> path;
+    if (found) {
+        Cell* p = endCell;
+
+        while (p != startCell) {
+            path.push_front(p);
+            p = parent[p->getRow()][p->getCol()];
+        }
+        path.push_front(startCell);
+    }
+
+    return path; 
+}
+
+Cell Labyrinth::getEndPoint()
+{
+    return this->endPoint;
+}
+
+std::list<Cell*> Labyrinth::getPathFromEntranceToExit()
+{
+    return this->pathFromEntranceToExit;
 }

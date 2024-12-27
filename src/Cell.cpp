@@ -19,17 +19,17 @@ Cell::Cell(int row, int col, char val)
 	this->val = val;
 }
 
-int Cell::getRow()
+int Cell::getRow() const
 {
 	return this->row;
 }
 
-int Cell::getCol()
+int Cell::getCol() const
 {
 	return this->col;
 }
 
-char Cell::getVal()
+char Cell::getVal() const
 {
 	return this->val;
 }
@@ -47,3 +47,17 @@ Cell& Cell::operator=(const Cell& other)
 	return *this;
 }
 
+void Cell::setRow(int row)
+{
+	this->row = row;
+}
+
+void Cell::setCol(int col)
+{
+	this->col = col;
+}
+
+bool Cell::operator==(const Cell& other) const
+{
+	return this->row == other.row && this->col == other.col;
+}
