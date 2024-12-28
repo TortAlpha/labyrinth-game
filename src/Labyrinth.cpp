@@ -99,9 +99,6 @@ void Labyrinth::createSemicircle(unsigned int centerRow, unsigned int centerCol,
                 // so the row with 'U' remains intact. 
                 if (topHalf) {
                     if (rr >= static_cast<int>(centerRow)) {
-                        // Optionally skip 'U' or 'I' if you want them to remain literal.
-                        // char currentVal = labyrinth[rr][cc].getVal();
-                        // if (currentVal != 'U' && currentVal != 'I') ...
                         labyrinth[rr][cc].setVal(' ');
                     }
                 }
