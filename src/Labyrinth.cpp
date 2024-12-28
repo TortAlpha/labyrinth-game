@@ -382,8 +382,11 @@ void Labyrinth::print()
             case 'I':
                 std::cout << termcolor::on_green << 'I' << termcolor::reset;
                 break;
+            case 'R':
+                std::cout << termcolor::on_bright_blue << 'R' << termcolor::reset;
+                break;
             case 'P':
-                std::cout << termcolor::on_bright_blue << 'P' << termcolor::reset;
+                std::cout << termcolor::yellow << 'P' << termcolor::reset;
                 break;
             case 'M':
                 std::cout << termcolor::on_bright_red << 'M' << termcolor::reset;

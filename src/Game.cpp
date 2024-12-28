@@ -50,7 +50,7 @@ void Game::spawn()
     Cell startPoint = this->labyrinth->getStartPoint();
 	startPoint.setRow(startPoint.getRow() + 1);
     this->player->setPosition(startPoint);
-    this->labyrinth->getCell(startPoint.getRow(), startPoint.getCol()).setVal('P');
+    this->labyrinth->getCell(startPoint.getRow(), startPoint.getCol()).setVal('R');
 	
 	logger.log("Player spawned at: " + std::to_string(startPoint.getRow()) + " " + std::to_string(startPoint.getCol()));
 
@@ -80,19 +80,19 @@ void Game::playerMovementUpdate(char command) {
     switch (command)
     {
         case 'w':
-            potential_pos = Cell(this->player->getPosition().getRow() - 1, this->player->getPosition().getCol(), 'P');
+            potential_pos = Cell(this->player->getPosition().getRow() - 1, this->player->getPosition().getCol(), 'R');
             break;
 
         case 's':
-            potential_pos = Cell(this->player->getPosition().getRow() + 1, this->player->getPosition().getCol(), 'P');
+            potential_pos = Cell(this->player->getPosition().getRow() + 1, this->player->getPosition().getCol(), 'R');
             break;
 
         case 'a':
-            potential_pos = Cell(this->player->getPosition().getRow(), this->player->getPosition().getCol() - 1, 'P');
+            potential_pos = Cell(this->player->getPosition().getRow(), this->player->getPosition().getCol() - 1, 'R');
             break;
 
         case 'd':
-            potential_pos = Cell(this->player->getPosition().getRow(), this->player->getPosition().getCol() + 1, 'P');
+            potential_pos = Cell(this->player->getPosition().getRow(), this->player->getPosition().getCol() + 1, 'R');
             break;
 
         default:
@@ -108,7 +108,7 @@ void Game::playerMovementUpdate(char command) {
 		this->labyrinth->getCell(
 					this->player->getPosition().getRow(),
 					this->player->getPosition().getCol()
-				).setVal('P');
+				).setVal('R');
 	}
 
     logger.log("Action: " + std::string(1, command));
@@ -178,12 +178,14 @@ void Game::checkGameObjectCollision()
 		).setVal('M');
 
 		logger.log("Game state updated: " + std::to_string(state));
+		return;
 	}
 
 	if (this->player->getPosition() == this->labyrinth->getEndPoint())
 	{
 		state = GAME_STATE::PLAYER_WON;
-			logger.log("Game state updated: " + std::to_string(state));
+		logger.log("Game state updated: " + std::to_string(state));
+		return;
 	}
 }
 

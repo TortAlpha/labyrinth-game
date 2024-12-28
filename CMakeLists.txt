@@ -13,11 +13,15 @@ add_executable(labirint-game-oop2-siit-2024
 	src/Cell.cpp 
 	src/Game.cpp 
 	src/Labyrinth.cpp 
-	src/Stack.cpp
 	src/Player.cpp
 	include/Input.h
 	src/Minotaur.cpp
-	src/Logger.cpp)
+	src/Logger.cpp
+	src/items/Item.cpp
+	src/items/FogOfWar.cpp
+	src/items/Hummer.cpp
+	src/items/Shield.cpp
+	src/items/Sword.cpp)
 
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
