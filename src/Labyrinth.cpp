@@ -405,7 +405,7 @@ void Labyrinth::setCell(unsigned int row, unsigned int col, const Cell& cell)
     }
 }
 
-Cell& Labyrinth::getCell(unsigned int row, unsigned int col)
+Cell& Labyrinth::getCell(unsigned int row, unsigned int col) const
 {
     return labyrinth[row][col];
 }
@@ -418,6 +418,16 @@ Cell Labyrinth::getStartPoint()
 bool Labyrinth::getMapGenerationSuccess()
 {
     return mapGeneratedSuccessfully;
+}
+
+unsigned int Labyrinth::getWidth()
+{
+    return this->width;
+}
+
+unsigned int Labyrinth::getHeight()
+{
+    return this->height;
 }
 
 //------------------------------------------------------------------------------

@@ -3,6 +3,7 @@
 #define SWORD_H
 
 #include "Item.h"
+#include "Cell.h"
 
 class Sword : public Item
 {
@@ -11,7 +12,7 @@ class Sword : public Item
 	public:
 		void applyEffect() override;	
 		void removeEffect() override;
-		Sword(int row, int col, int effectDuration = 3) : Item(row, col, effectDuration) {};
+		Sword(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) {};
 		~Sword();		
 };
 

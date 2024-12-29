@@ -26,10 +26,7 @@ private:
                       unsigned int er, unsigned int ec);
 	bool wallCondition();
 
-	
-
 public:
-
 
 	Labyrinth();
 	Labyrinth(unsigned int width, unsigned int height);
@@ -40,8 +37,11 @@ public:
 	Cell getEndPoint();
 	Cell getStartPoint();
 
+	unsigned int getWidth();
+	unsigned int getHeight();
+
 	void setCell(unsigned int row, unsigned int col, const Cell& cell);
-	Cell& getCell(unsigned int row, unsigned int col);
+	Cell& getCell(unsigned int row, unsigned int col) const;
 
 	bool getMapGenerationSuccess();
 

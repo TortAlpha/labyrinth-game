@@ -3,6 +3,7 @@
 #define HUMMER_H
 
 #include "Item.h"
+#include "Cell.h"
 
 class Hummer : public Item
 {
@@ -11,7 +12,7 @@ class Hummer : public Item
 	public:
 		void applyEffect() override;
 		void removeEffect() override;
-		Hummer(int row, int col, int effectDuration = 3) : Item(row, col, effectDuration) {};
+		Hummer(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) {};
 		~Hummer();
 };
 

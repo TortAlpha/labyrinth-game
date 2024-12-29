@@ -3,6 +3,7 @@
 #define FOGOFWAR_H
 
 #include "Item.h"
+#include "Cell.h"
 
 class FogOfWar : public Item
 {
@@ -11,7 +12,7 @@ class FogOfWar : public Item
 	public:
 		void applyEffect() override;
 		void removeEffect() override;
-		FogOfWar(int row, int col, int effectDuration = 3) : Item(row, col, effectDuration) {};
+		FogOfWar(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) {};
 		~FogOfWar();
 };
 

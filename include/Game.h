@@ -5,6 +5,8 @@
 #include "Player.h"
 #include "Minotaur.h"
 #include "Logger.h"
+#include "items/Item.h"
+#include <list>
 
 class Game
 {
@@ -13,10 +15,10 @@ private:
 	Labyrinth* labyrinth;
 	Player* player;
 	Minotaur* minotaur;
-	//List<Item>* items;
-
+	std::list<Item*> items;
 
 	Logger logger;
+	
 	enum GAME_STATE {
 		PLAYING,
 		PLAYER_WON,
@@ -26,7 +28,7 @@ private:
 
 	GAME_STATE state;
 
-	void init(unsigned int width, unsigned int height);
+	void init(unsigned int width, unsigned int height, unsigned int numItems);
 	void spawn();
 
 	bool isWall(Cell position);
@@ -39,7 +41,7 @@ private:
 	void printGameWon();
 
 public:
-	Game(unsigned int width, unsigned int height);
+	Game(unsigned int width, unsigned int height, unsigned int numItems);
 	~Game();
 
 	void updateGameState();

@@ -3,6 +3,7 @@
 #define SHIELD_H
 
 #include "Item.h"
+#include "Cell.h"
 
 class Shield : public Item
 {
@@ -11,7 +12,7 @@ class Shield : public Item
 	public:
 		void applyEffect() override;
 		void removeEffect() override;
-		Shield(int row, int col, int effectDuration = 3) : Item(row, col, effectDuration) {};
+		Shield(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) {};
 		~Shield();
 };
 

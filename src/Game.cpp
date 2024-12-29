@@ -4,21 +4,26 @@
 #include "Cell.h"
 #include "Input.h"
 #include "termcolor.hpp"
+#include "items/Item.h"
+#include "items/FogOfWar.h"
+#include "items/Hummer.h"
+#include "items/Shield.h"
+#include "items/Sword.h"
 #include <ctime>
 #include <cstdlib>
 #include <iostream>
 #include <thread>
 #include <chrono>
 
-Game::Game(unsigned int width, unsigned int height) : logger("game.log"), state(GAME_STATE::PLAYING)
+Game::Game(unsigned int width, unsigned int height, unsigned int numItems) : logger("game.log"), state(GAME_STATE::PLAYING)
 {
-    this->init(width, height);
+    this->init(width, height, numItems);
     this->spawn();
     this->labyrinth->print();
     this->updateGameState();
 }
 
-void Game::init(unsigned int width, unsigned int height)
+void Game::init(unsigned int width, unsigned int height, unsigned int numItems)
 {
 	
 	logger.log("Game init with width: " + std::to_string(width) + " and height: " + std::to_string(height));
@@ -35,6 +40,7 @@ void Game::init(unsigned int width, unsigned int height)
 	logger.log("Start point: " + std::to_string(this->labyrinth->getStartPoint().getRow()) + " " + std::to_string(this->labyrinth->getStartPoint().getCol()));
 	logger.log("End point: " + std::to_string(this->labyrinth->getEndPoint().getRow()) + " " + std::to_string(this->labyrinth->getEndPoint().getCol()));
 
+	this->items = std::list<Item*>(numItems);
     this->player = new Player();
 	this->minotaur = new Minotaur();
 }
@@ -64,6 +70,69 @@ void Game::spawn()
 	this->minotaur->setPosition(*minotaurPos);
 	this->labyrinth->getCell(minotaurPos->getRow(), minotaurPos->getCol()).setVal('M');
 	logger.log("Minotaur spawned at: " + std::to_string(minotaurPos->getRow()) + " " + std::to_string(minotaurPos->getCol()));
+
+	//Items
+	auto checkPosForItem = [&](Cell pos) -> bool {
+		return this->labyrinth->getCell(pos.getRow(), pos.getCol()).getVal() == ' ';
+	};
+	
+
+	for (auto it = this->items.begin(); it != this->items.end(); ++it)
+	{
+		int rndNum = rand() % 4;
+
+		Cell item_pos(
+			randomNumBetween(1, this->labyrinth->getHeight() - 2),
+			randomNumBetween(1, this->labyrinth->getWidth() - 2),
+			'P'
+		);
+
+		while (!checkPosForItem(item_pos)) {
+			item_pos.setRow(randomNumBetween(1, this->labyrinth->getHeight() - 2));
+			item_pos.setCol(randomNumBetween(1, this->labyrinth->getWidth() - 2));
+		}
+
+		logger.log("Generated position for item: " + std::to_string(item_pos.getRow()) + " " + std::to_string(item_pos.getCol()));
+
+		Item* newItem = nullptr;
+
+		switch (rndNum)
+		{
+			case 0:
+				newItem = new FogOfWar(item_pos);
+				break;
+
+			case 1:
+				newItem = new Hummer(item_pos);
+				break;
+
+			case 2:
+				newItem = new Shield(item_pos);
+				break;
+
+			case 3:
+				newItem = new Sword(item_pos);
+				break;
+			default:
+				logger.log("Problem with item spawn.");
+				break;
+		}
+
+		*it = newItem;
+		
+
+		labyrinth->getCell(
+			newItem->getPosition().getRow(),
+			newItem->getPosition().getCol()
+		).setVal('P');
+
+
+		logger.log("Item spawned at: " 
+			+ std::to_string(newItem->getPosition().getRow()) + " " 
+			+ std::to_string(newItem->getPosition().getCol()));
+		
+	}
+
 }	
 
 //
