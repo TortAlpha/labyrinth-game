@@ -1,5 +1,6 @@
 
 #include "items/Item.h"
+#include "termcolor.hpp"
 
 Item::~Item()
 {
@@ -8,6 +9,11 @@ Item::~Item()
 void Item::activate()
 {
 	active = true;
+}
+
+void Item::deactivate()
+{
+	active = false;
 }
 
 void Item::setEffectDuration(int effectDuration)
@@ -25,6 +31,16 @@ Cell Item::getPosition() const
 	return position;
 }
 
+void Item::setUsed()
+{
+	used = true;
+}
+
+bool Item::isUsed()
+{
+	return used;
+}
+
 bool Item::isActive() const
 {
 	return active;
@@ -33,4 +49,20 @@ bool Item::isActive() const
 int Item::getEffectDuration() const
 {
 	return effectDuration;
+}
+
+
+void Item::printInfoMessage()
+{
+	std::cout << termcolor::on_yellow << infoMessage << termcolor::reset << std::endl;
+}
+
+void Item::printTakeMessage()
+{
+	std::cout << termcolor::on_yellow << takeMessage << termcolor::reset << std::endl;
+}
+
+void Item::printRemoveMessage()
+{
+	std::cout << termcolor::on_yellow << removeMessage << termcolor::reset << std::endl;
 }

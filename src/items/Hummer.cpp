@@ -1,17 +1,17 @@
 
 #include "items/Hummer.h"
-
+#include "Player.h"
 
 Hummer::~Hummer()
 {
 }
 
-void Hummer::applyEffect()
+void Hummer::applyEffect(Player& player)
 {
-	// Apply effect
+	player.addHummerEffect();
 }
 
-void Hummer::removeEffect()
+void Hummer::removeEffect(Player& player)
 {
-	// Remove effect
+	player.removeHummerEffect();
 }

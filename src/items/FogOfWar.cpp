@@ -5,12 +5,12 @@ FogOfWar::~FogOfWar()
 {
 }
 
-void FogOfWar::applyEffect()
+void FogOfWar::applyEffect(Player& player)
 {
-	// Apply effect
+	player.addFogOfWarEffect();
 }
 
-void FogOfWar::removeEffect()
+void FogOfWar::removeEffect(Player& player)
 {
-	// Remove effect
+	player.removeFogOfWarEffect();
 }

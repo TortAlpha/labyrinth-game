@@ -1,9 +1,6 @@
 
 #include "Minotaur.h"
 
-Minotaur::Minotaur(/* args */)
-{
-}
 
 Minotaur::~Minotaur()
 {

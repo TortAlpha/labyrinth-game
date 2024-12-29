@@ -5,12 +5,12 @@ Shield::~Shield()
 {
 }
 
-void Shield::applyEffect()
+void Shield::applyEffect(Player& player)
 {
-	// Apply effect
+	player.addShieldEffect();
 }
 
-void Shield::removeEffect()
+void Shield::removeEffect(Player& player)
 {
-	// Remove effect
+	player.removeShieldEffect();
 }

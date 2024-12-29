@@ -10,9 +10,10 @@ class Sword : public Item
 	private:
 
 	public:
-		void applyEffect() override;	
-		void removeEffect() override;
-		Sword(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) {};
+		void applyEffect(Player& player) override;	
+		void removeEffect(Player& player) override;
+		Sword(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) 
+		{ takeMessage = "Sword effect applied."; removeMessage = "Sword effect removed."; infoMessage = "Sword effect active."; };
 		~Sword();		
 };
 

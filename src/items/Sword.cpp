@@ -5,12 +5,12 @@ Sword::~Sword()
 {
 }
 
-void Sword::applyEffect()
+void Sword::applyEffect(Player& player)
 {
-	// Apply effect
+	player.addSwordEffect();
 }
 
-void Sword::removeEffect()
+void Sword::removeEffect(Player& player)
 {
-	// Remove effect
+	player.removeSwordEffect();
 }

@@ -398,6 +398,43 @@ void Labyrinth::print()
     }
 }
 
+void Labyrinth::printWithFogOfWar(const Cell& playerPos)
+{       
+    int fogRadius = 1;
+    for (unsigned int r = 0; r < height; r++) {
+        for (unsigned int c = 0; c < width; c++) {
+            if (std::abs((int)r - (int)playerPos.getRow()) <= fogRadius &&
+                std::abs((int)c - (int)playerPos.getCol()) <= fogRadius || r == 0 || r == height - 1 || c == 0 || c == width - 1)
+            {
+                switch (labyrinth[r][c].getVal())
+                {
+                case 'U':
+                    std::cout << termcolor::green << 'U' << termcolor::reset;
+                    break;
+                case 'I':
+                    std::cout << termcolor::on_green << 'I' << termcolor::reset;
+                    break;
+                case 'R':
+                    std::cout << termcolor::on_bright_blue << 'R' << termcolor::reset;
+                    break;
+                case 'P':
+                    std::cout << termcolor::yellow << 'P' << termcolor::reset;
+                    break;
+                case 'M':
+                    std::cout << termcolor::on_bright_red << 'M' << termcolor::reset;
+                    break;
+                default:
+                    std::cout << labyrinth[r][c];
+                    break;
+                }
+            } else {
+                std::cout << ' ';
+            }
+        }
+        std::cout << "\n";
+    }
+}
+
 void Labyrinth::setCell(unsigned int row, unsigned int col, const Cell& cell)
 {
     if (row < height && col < width) {

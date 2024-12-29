@@ -9,11 +9,15 @@ class Minotaur {
 	private:
 			
 		Cell position;
+		bool alive;
 
 	public:
 
-		Minotaur(/* args */);
+		Minotaur(/* args */) : alive(true) {};
 		~Minotaur();
+
+		bool isAlive() { return alive; };
+		void kill() { alive = false; }
 
 		Cell getPosition();
 		void setPosition(Cell position);

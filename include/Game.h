@@ -18,7 +18,7 @@ private:
 	std::list<Item*> items;
 
 	Logger logger;
-	
+
 	enum GAME_STATE {
 		PLAYING,
 		PLAYER_WON,
@@ -27,8 +27,9 @@ private:
 	};
 
 	GAME_STATE state;
+	int numItems;
 
-	void init(unsigned int width, unsigned int height, unsigned int numItems);
+	void init(unsigned int width, unsigned int height);
 	void spawn();
 
 	bool isWall(Cell position);
@@ -36,6 +37,11 @@ private:
 	void checkGameObjectCollision();
 	void playerMovementUpdate(char command);
 	void minotaurMovementUpdate();
+	void itemsEffectUpdate();
+
+	void attackMinotaur();
+
+	void printMap();
 
 	void printGameOver();
 	void printGameWon();

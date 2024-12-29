@@ -33,6 +33,7 @@ public:
 	~Labyrinth();
 	bool generate();
 	void print();
+	void printWithFogOfWar(const Cell& playerPos);
 
 	Cell getEndPoint();
 	Cell getStartPoint();
