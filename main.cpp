@@ -10,7 +10,7 @@ int main(void) {
     std::cout << "Enter number of items: ";
     std::cin >> numItems;
     
-    if (width < 15 && height < 15) {
+    if (width < 15 || height < 15) {
         std::cout << "Width and height must be at least 15.\n";
         return 1;
     }

@@ -12,7 +12,7 @@ class FogOfWar : public Item
 		void applyEffect(Player& player) override;
 		void removeEffect(Player& player) override;
 		FogOfWar(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) { takeMessage = "Fog of War effect applied."; removeMessage = "Fog of War effect removed."; infoMessage = "Fog of War effect active."; };
-		~FogOfWar();
+		~FogOfWar() override;
 };
 
 #endif // FOGOFWAR_H

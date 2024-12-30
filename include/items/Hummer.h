@@ -16,7 +16,7 @@ class Hummer : public Item
 		Hummer(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) { takeMessage = "Hummer effect applied."; 
 		removeMessage = "Hummer effect removed."; 
 		infoMessage = "Hummer effect active."; };
-		~Hummer();
+		~Hummer() override;
 };
 
 #endif // HUMMER_H

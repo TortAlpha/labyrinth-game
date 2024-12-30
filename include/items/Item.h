@@ -43,7 +43,8 @@ class Item
 
 		Item(Cell position, int effectDuration = 3) : position(position), effectDuration(effectDuration), active(false), used(false) {};
 		Item(int row, int col, int effectDuration = 3) : position(row, col, 'P'), effectDuration(effectDuration), active(false), used(false) {};
-		~Item();
+		
+		virtual ~Item();
 
 };
 

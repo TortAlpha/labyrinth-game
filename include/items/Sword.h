@@ -14,7 +14,7 @@ class Sword : public Item
 		void removeEffect(Player& player) override;
 		Sword(Cell pos, int effectDuration = 3) : Item(pos, effectDuration) 
 		{ takeMessage = "Sword effect applied."; removeMessage = "Sword effect removed."; infoMessage = "Sword effect active."; };
-		~Sword();		
+		~Sword() override;		
 };
 
 #endif // SWORD_H
