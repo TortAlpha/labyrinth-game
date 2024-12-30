@@ -1,4 +1,3 @@
-
 #ifndef FOGOFWAR_H
 #define FOGOFWAR_H
 

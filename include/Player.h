@@ -47,7 +47,7 @@ class Player {
 
 		bool isImmuneToMinotaur() const { return immuneToMinotaur; }
 		int getImmuneDuration() const { return immuneDuration; }
-		void decreaseImmuneDuration() { immuneDuration--; }
+		void decreaseImmuneDuration() { immuneDuration--; if (immuneDuration == 0) immuneToMinotaur = false; }
 
 		bool hasSwordEffect() const { return swordEffect; }
 		bool hasShieldEffect() const { return shieldEffect; }
