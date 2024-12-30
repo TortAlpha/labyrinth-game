@@ -6,6 +6,7 @@
 #include <cmath>
 #include <ctime>
 #include <cstdlib>
+#include <fstream>
 #include <list>
 #include <termcolor.hpp>
 
@@ -21,6 +22,16 @@ static int randomBool(double p) {
     return (r < p) ? 1 : 0;
 }
 
+/**
+ * @brief Constructs a Labyrinth object with the specified width and height.
+ * 
+ * @param w The width of the labyrinth.
+ * @param h The height of the labyrinth.
+ * 
+ * @details 
+ * Initializes the labyrinth grid, sets all cells to walls ('#'), and attempts to generate a valid map.
+ * If successful, it finds a path from the entrance to the exit.
+ */
 Labyrinth::Labyrinth(unsigned int w, unsigned int h)
     : width(w), height(h)
 {
@@ -45,6 +56,12 @@ Labyrinth::Labyrinth(unsigned int w, unsigned int h)
     }
 }
 
+/**
+ * @brief Destructor for the Labyrinth class.
+ * 
+ * @details 
+ * Deallocates the dynamically allocated labyrinth grid.
+ */
 Labyrinth::~Labyrinth()
 {
     for (unsigned int r = 0; r < height; r++) {
@@ -398,6 +415,20 @@ void Labyrinth::print()
     }
 }
 
+void Labyrinth::saveToFile(const std::string& filename)
+{
+    std::ofstream file(filename, std::ios::out);
+    if (file.is_open()) {
+        for (unsigned int r = 0; r < height; r++) {
+            for (unsigned int c = 0; c < width; c++) {
+                file << labyrinth[r][c].getVal();
+            }
+            file << "\n";
+        }
+        file.close();
+    }
+}
+
 void Labyrinth::printWithFogOfWar(const Cell& playerPos)
 {       
     int fogRadius = 1;
@@ -442,6 +473,13 @@ void Labyrinth::setCell(unsigned int row, unsigned int col, const Cell& cell)
     }
 }
 
+/**
+ * @brief Retrieves a reference to the specified cell in the labyrinth.
+ * 
+ * @param row The row index of the cell.
+ * @param col The column index of the cell.
+ * @return Cell& Reference to the specified cell.
+ */
 Cell& Labyrinth::getCell(unsigned int row, unsigned int col) const
 {
     return labyrinth[row][col];

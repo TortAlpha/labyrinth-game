@@ -17,7 +17,16 @@
 #include <thread>
 #include <chrono>
 
-// Constructor: Initializes the game with specified width, height, and number of items
+/**
+ * @brief Constructs a Game object with specified dimensions and number of items.
+ * 
+ * @param width The width of the labyrinth.
+ * @param height The height of the labyrinth.
+ * @param numItems The number of items to spawn in the labyrinth.
+ * 
+ * @details 
+ * Initializes the game by setting up the labyrinth, spawning entities, and starting the game loop.
+ */
 Game::Game(unsigned int width, unsigned int height, unsigned int numItems)
     : logger("game.log"), state(GAME_STATE::PLAYING), numItems(numItems)
 {
@@ -28,6 +37,15 @@ Game::Game(unsigned int width, unsigned int height, unsigned int numItems)
 }
 
 // Initializes the labyrinth, player, minotaur, and item list
+/**
+ * @brief Initializes the game components including the labyrinth, player, minotaur, and items.
+ * 
+ * @param width The width of the labyrinth.
+ * @param height The height of the labyrinth.
+ * 
+ * @details 
+ * Sets up the labyrinth grid, checks for successful generation, and initializes the player and minotaur entities.
+ */
 void Game::init(unsigned int width, unsigned int height)
 {
     logger.log("Game init with width: " + std::to_string(width) + " and height: " + std::to_string(height));
@@ -54,6 +72,12 @@ void Game::init(unsigned int width, unsigned int height)
 }
 
 // Spawns the player, minotaur, and randomly places items in the labyrinth
+/**
+ * @brief Spawns the player, minotaur, and items within the labyrinth.
+ * 
+ * @details 
+ * Positions the player at the start point, places the minotaur along the generated path, and randomly distributes items ensuring they are placed on empty cells.
+ */
 void Game::spawn()
 {
     srand(static_cast<unsigned int>(time(nullptr))); // Seed the random number generator
@@ -145,18 +169,42 @@ void Game::spawn()
 }
 
 // Checks if a given position is a wall or entrance
+/**
+ * @brief Determines if a specific cell is a wall or the entrance.
+ * 
+ * @param position The cell position to check.
+ * @return true If the cell is a wall ('#') or the entrance ('U').
+ * @return false Otherwise.
+ */
 bool Game::isWall(const Cell& position) const {
     char cellVal = labyrinth->getCell(position.getRow(), position.getCol()).getVal();
     return cellVal == '#' || cellVal == 'U';
 }
 
 // Checks if a given position is on the border of the map
+/**
+ * @brief Determines if a specific cell is on the border of the labyrinth.
+ * 
+ * @param position The cell position to check.
+ * @return true If the cell is on the border.
+ * @return false Otherwise.
+ */
 bool Game::isMapBorder(const Cell& position) const {
     return position.getRow() == 0 || position.getRow() == labyrinth->getHeight() - 1 ||
            position.getCol() == 0 || position.getCol() == labyrinth->getWidth() - 1;
 }
 
 // Updates the player's movement based on input command
+/**
+ * @brief Updates the player's position based on the input command.
+ * 
+ * @param command The input command character ('w', 'a', 's', 'd', etc.).
+ * 
+ * @details 
+ * Moves the player in the specified direction if the target cell is not a wall.
+ * Handles interactions with walls if the player has the Hummer effect.
+ * Updates active item effects and logs the player's actions.
+ */
 void Game::playerMovementUpdate(char command) {
     Cell potential_pos;
 
@@ -243,6 +291,14 @@ void Game::playerMovementUpdate(char command) {
 }
 
 // Updates the minotaur's position randomly, avoiding walls and the end point
+/**
+ * @brief Moves the minotaur randomly within the labyrinth, avoiding walls and the exit.
+ * 
+ * @details 
+ * Attempts to move the minotaur in a random direction up to a maximum number of attempts.
+ * Ensures the minotaur does not move into walls or the exit point.
+ * Logs the minotaur's new position after a successful move.
+ */
 void Game::minotaurMovementUpdate()
 {
     Cell minotaur_pos = minotaur->getPosition();
@@ -298,6 +354,14 @@ void Game::minotaurMovementUpdate()
 }
 
 // Handles collisions between the player, minotaur, and items
+/**
+ * @brief Checks and handles collisions between the player, minotaur, and items.
+ * 
+ * @details 
+ * - If the player collides with the minotaur and is not immune, the game state is updated to PLAYER_LOST.
+ * - If the player reaches the exit, the game state is updated to PLAYER_WON.
+ * - Handles interactions with items, activating or deactivating them based on collisions.
+ */
 void Game::checkGameObjectCollision()
 {
     // Check if the player and minotaur occupy the same position and the player is not immune
@@ -349,6 +413,13 @@ void Game::checkGameObjectCollision()
 }
 
 // Updates the duration of active item effects and removes them if expired
+/**
+ * @brief Updates the duration of active item effects and removes them if their duration has expired.
+ * 
+ * @details 
+ * Iterates through all items, decrementing their effect durations. If an item's effect duration reaches zero,
+ * the effect is removed from the player, and the item is deactivated and marked as used.
+ */
 void Game::itemsEffectUpdate()
 {
     for (auto it = items.begin(); it != items.end(); ++it)
@@ -369,6 +440,14 @@ void Game::itemsEffectUpdate()
 }
 
 // Allows the player to attack the minotaur within a radius of 1 cell around them
+/**
+ * @brief Allows the player to attack and kill the minotaur if it is within attack range.
+ * 
+ * @details 
+ * If the player has the Sword effect, this method checks all cells within a 1-cell radius around the player.
+ * If the minotaur is found within this range, it is killed, the Sword effect is removed, and the action is logged.
+ * If no minotaur is within range, an appropriate message is logged.
+ */
 void Game::attackMinotaur() 
 {
     if (player->hasSwordEffect()) 
@@ -414,6 +493,13 @@ void Game::attackMinotaur()
 }
 
 // Main game loop that updates the game state continuously until the game ends
+/**
+ * @brief Starts and manages the main game loop, handling player input, minotaur movement, collisions, and rendering.
+ * 
+ * @details 
+ * Continuously updates the game state by processing player commands, moving the minotaur at regular intervals,
+ * checking for collisions, and rendering the labyrinth. Displays active effects on the player and handles game termination.
+ */
 void Game::updateGameState()
 {
     logger.log("Game state updated: " + std::to_string(state));
@@ -507,10 +593,19 @@ void Game::updateGameState()
             break;
     }
 
+    this->labyrinth->saveToFile("labyrinth.txt"); // Save the labyrinth to a file
+
     input::disableRawMode(); // Disable raw mode before exiting
 }
 
 // Renders the current state of the map, considering active effects like Fog of War
+/**
+ * @brief Renders the current state of the labyrinth to the console.
+ * 
+ * @details 
+ * Clears the console and prints the labyrinth. If the player has the Fog of War effect active,
+ * it limits the visibility based on the player's position.
+ */
 void Game::printMap() 
 {
     // Clear the console screen
@@ -525,6 +620,12 @@ void Game::printMap()
 }
 
 // Displays a "Game Over" ASCII art message
+/**
+ * @brief Displays the "Game Over" ASCII art message.
+ * 
+ * @details 
+ * Outputs a stylized "Game Over" message in red color to the console.
+ */
 void Game::printGameOver() 
 {
     std::cout << termcolor::red << termcolor::bold;
@@ -538,6 +639,12 @@ void Game::printGameOver()
 }
 
 // Displays a "You Won" ASCII art message
+/**
+ * @brief Displays the "You Won" ASCII art message.
+ * 
+ * @details 
+ * Outputs a stylized "You Won" message in green color to the console.
+ */
 void Game::printGameWon() 
 {
     std::cout << termcolor::green << termcolor::bold;
@@ -551,6 +658,13 @@ void Game::printGameWon()
 }
 
 // Destructor: Cleans up dynamically allocated memory
+/**
+ * @brief Destructor for the Game class.
+ * 
+ * @details 
+ * Deallocates all dynamically allocated memory, including the labyrinth, player, minotaur, and items,
+ * to prevent memory leaks.
+ */
 Game::~Game()
 {
     // Delete dynamically allocated objects to prevent memory leaks

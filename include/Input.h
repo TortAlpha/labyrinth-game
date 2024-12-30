@@ -1,4 +1,7 @@
-// Input.h
+
+// Description: This file contains the implementation of the input functions.
+// Helper functions to enable raw mode and disable raw mode for terminal input.
+
 #pragma once
 
 #include <termios.h>
