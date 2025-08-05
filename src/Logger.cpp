@@ -53,5 +53,15 @@ Logger::~Logger() {
 void Logger::log(const std::string& message) {
     if (logFile.is_open()) {                                 // Check if log file is open
         logFile << "[" << getCurrentTime() << "] " << message << std::endl; // Write timestamped message
+        logFile.flush();                                     // Force write to file immediately
+    }
+}
+
+void Logger::save(const std::string& message) {
+    if (logFile.is_open()) {                                 // Check if log file is open
+        logFile << message << std::endl;                     // Write the message to the log file
+        logFile.flush();                                     // Force write to file immediately
+    } else {
+        std::cerr << "Error: Log file is not open." << std::endl; // Error handling if log file is not open
     }
 }

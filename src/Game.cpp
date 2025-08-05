@@ -23,17 +23,79 @@
  * @param width The width of the labyrinth.
  * @param height The height of the labyrinth.
  * @param numItems The number of items to spawn in the labyrinth.
+ * @param startGame Whether to automatically start the game loop (default: true for backward compatibility).
  * 
  * @details 
- * Initializes the game by setting up the labyrinth, spawning entities, and starting the game loop.
+ * Initializes the game by setting up the labyrinth, spawning entities. If startGame is true, starts the game loop.
  */
-Game::Game(unsigned int width, unsigned int height, unsigned int numItems)
-    : logger("game.log"), state(GAME_STATE::PLAYING), numItems(numItems)
+Game::Game(unsigned int width, unsigned int height, unsigned int numItems, bool startGame)
+    : logger("game.log"), state(GAME_STATE::PLAYING), numItems(numItems), labyrinth(nullptr), player(nullptr), minotaur(nullptr)
 {
-    init(width, height);      // Initialize the labyrinth and game entities
-    spawn();                   // Spawn player, minotaur, and items
-    labyrinth->print();        // Display the initial state of the labyrinth
-    updateGameState();         // Start the game loop
+    logger.log("Game constructor started");  // Test log entry
+    init(width, height, false, true);   // Initialize with quiet mode disabled and exit on failure enabled
+    spawn();                            // Spawn player, minotaur, and items
+    labyrinth->print();                 // Display the initial state of the labyrinth
+    
+    if (startGame) {
+        updateGameState();              // Start the game loop only if requested
+    }
+}
+
+/**
+ * @brief Constructs a Game object with specified dimensions, items count, game start flag, and quiet mode.
+ * 
+ * @param width The width of the labyrinth.
+ * @param height The height of the labyrinth.
+ * @param numItems The number of items to spawn in the labyrinth.
+ * @param startGame Whether to automatically start the game loop.
+ * @param quiet Whether to enable quiet mode for the labyrinth.
+ * 
+ * @details 
+ * Initializes the game by setting up the labyrinth with quiet mode, spawning entities. If startGame is true, starts the game loop.
+ */
+Game::Game(unsigned int width, unsigned int height, unsigned int numItems, bool startGame, bool quiet)
+    : logger("game.log"), state(GAME_STATE::PLAYING), numItems(numItems), labyrinth(nullptr), player(nullptr), minotaur(nullptr)
+{
+    init(width, height, quiet, true); // Initialize with exit on failure enabled for backward compatibility
+    spawn();                          // Spawn player, minotaur, and items
+    if (!quiet) {
+        labyrinth->print();           // Display the initial state only if not in quiet mode
+    }
+    
+    if (startGame) {
+        updateGameState();            // Start the game loop only if requested
+    }
+}
+
+/**
+ * @brief Constructs a Game object for testing with non-exit behavior on map generation failure.
+ * 
+ * @param width The width of the labyrinth.
+ * @param height The height of the labyrinth.
+ * @param numItems The number of items to spawn in the labyrinth.
+ * @param startGame Whether to automatically start the game loop.
+ * @param quiet Whether to enable quiet mode for the labyrinth.
+ * @param exitOnFailure Whether to exit on map generation failure.
+ * 
+ * @details 
+ * Initializes the game by setting up the labyrinth with quiet mode and exit behavior control, spawning entities. If startGame is true, starts the game loop.
+ */
+Game::Game(unsigned int width, unsigned int height, unsigned int numItems, bool startGame, bool quiet, bool exitOnFailure)
+    : logger("game.log"), state(GAME_STATE::PLAYING), numItems(numItems), labyrinth(nullptr), player(nullptr), minotaur(nullptr)
+{
+    init(width, height, quiet, exitOnFailure); // Initialize with exit behavior control
+    
+    // Only spawn entities and start game if map generation was successful
+    if (labyrinth && labyrinth->getMapGenerationSuccess()) {
+        spawn();                    // Spawn player, minotaur, and items
+        if (!quiet) {
+            labyrinth->print();     // Display the initial state only if not in quiet mode
+        }
+        
+        if (startGame) {
+            updateGameState();      // Start the game loop only if requested
+        }
+    }
 }
 
 // Initializes the labyrinth, player, minotaur, and item list
@@ -46,20 +108,29 @@ Game::Game(unsigned int width, unsigned int height, unsigned int numItems)
  * @details 
  * Sets up the labyrinth grid, checks for successful generation, and initializes the player and minotaur entities.
  */
-void Game::init(unsigned int width, unsigned int height)
+void Game::init(unsigned int width, unsigned int height, bool quiet, bool exitOnFailure)
 {
+
     logger.log("Game init with width: " + std::to_string(width) + " and height: " + std::to_string(height));
 
     // Dynamically allocate the labyrinth
-    labyrinth = new Labyrinth(width, height);
+    labyrinth = new Labyrinth(width, height, quiet);
 
     // Check if labyrinth generation was successful
     if (!labyrinth->getMapGenerationSuccess()) {
-        std::cout << "Try again.\n";
+        if (!quiet) {
+            std::cout << "Try again.\n";
+        }
         logger.log("Map generation failed. Exiting...");
-        exit(1);
+        if (exitOnFailure) {
+            exit(1);
+        } else {
+            // For test environments, don't exit but return without initializing entities
+            return;
+        }
     }
     logger.log("Map generated successfully.");
+    logger.log("Time taken to generate the labyrinth: " + std::to_string(labyrinth->getGenerationTime()) + " ms");
 
     // Log start and end points of the labyrinth
     logger.log("Start point: " + std::to_string(labyrinth->getStartPoint().getRow()) + " " + std::to_string(labyrinth->getStartPoint().getCol()));
@@ -593,7 +664,42 @@ void Game::updateGameState()
             break;
     }
 
-    this->labyrinth->saveToFile("labyrinth.txt"); // Save the labyrinth to a file
+    Logger resultLogger("result.log");
+    // Log final game state and labyrinth
+    std::string stateText;
+    switch (state) {
+        case GAME_STATE::PLAYING:
+            stateText = "PLAYING (0)";
+            break;
+        case GAME_STATE::PLAYER_WON:
+            stateText = "PLAYER_WON (1)";
+            break;
+        case GAME_STATE::PLAYER_LOST:
+            stateText = "PLAYER_LOST (2)";
+            break;
+        case GAME_STATE::QUIT:
+            stateText = "QUIT (3)";
+            break;
+        default:
+            stateText = "UNKNOWN (" + std::to_string(state) + ")";
+            break;
+    }
+    
+    resultLogger.save("Game ended with final state: " + stateText);
+    resultLogger.save("Final player position: " + std::to_string(player->getPosition().getRow()) + " " + std::to_string(player->getPosition().getCol()));
+    resultLogger.save("Final minotaur position: " + std::to_string(minotaur->getPosition().getRow()) + " " + std::to_string(minotaur->getPosition().getCol()));
+    resultLogger.save("Minotaur alive: " + std::string(minotaur->isAlive() ? "true" : "false"));
+
+    // Log final labyrinth state
+    resultLogger.save("=== FINAL LABYRINTH STATE ===");
+    for (unsigned int r = 0; r < labyrinth->getHeight(); r++) {
+        std::string row = "";
+        for (unsigned int c = 0; c < labyrinth->getWidth(); c++) {
+            row += labyrinth->getCell(r, c).getVal();
+        }
+        resultLogger.save(row);
+    }
+    resultLogger.save("=== END FINAL LABYRINTH STATE ===");
 
     input::disableRawMode(); // Disable raw mode before exiting
 }
@@ -668,12 +774,66 @@ void Game::printGameWon()
 Game::~Game()
 {
     // Delete dynamically allocated objects to prevent memory leaks
-    delete labyrinth;
-    delete player;
-    delete minotaur;
+    if (labyrinth) delete labyrinth;
+    if (player) delete player;
+    if (minotaur) delete minotaur;
 
     // Iterate through the items list and delete each item
     for (auto it = items.begin(); it != items.end(); ++it) {
         delete *it;
     }
+}
+
+/**
+ * @brief Starts the game loop if not already started.
+ * 
+ * @details 
+ * This method can be called to explicitly start the game loop after construction.
+ * Useful for testing scenarios where you want to set up the game without immediately starting.
+ */
+void Game::start()
+{
+    if (state == GAME_STATE::PLAYING) {
+        updateGameState();
+    }
+}
+
+/**
+ * @brief Gets the current labyrinth instance.
+ * 
+ * @return Pointer to the labyrinth object.
+ */
+Labyrinth* Game::getLabyrinth() const
+{
+    return labyrinth;
+}
+
+/**
+ * @brief Gets the current player instance.
+ * 
+ * @return Pointer to the player object.
+ */
+Player* Game::getPlayer() const
+{
+    return player;
+}
+
+/**
+ * @brief Gets the current minotaur instance.
+ * 
+ * @return Pointer to the minotaur object.
+ */
+Minotaur* Game::getMinotaur() const
+{
+    return minotaur;
+}
+
+/**
+ * @brief Checks if the labyrinth was successfully generated.
+ * 
+ * @return true if labyrinth generation was successful, false otherwise.
+ */
+bool Game::isLabyrinthGenerated() const
+{
+    return labyrinth != nullptr && labyrinth->getMapGenerationSuccess();
 }

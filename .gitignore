@@ -1,5 +1,83 @@
-build
-.vscode
-docs
-Doxyfile
+# Build directories
+build/
+build-*/
+cmake-build-*/
+
+# Test artifacts
+*.gcov
+*.gcda
+*.gcno
+coverage.info
+coverage_html/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+labyrinth-game
+run-tests
+
+# Log files
+*.log
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+!tests/CMakeLists.txt
+!CMakeLists.txt
+
+# Test results
+Testing/
+
+# Documentation generated files
+docs/
+*.pdf
+
+# Package files
+*.zip
+*.tar.gz
+*.deb
+*.rpm
