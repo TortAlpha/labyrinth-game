@@ -29,6 +29,7 @@ private:
     Minotaur* minotaur;             ///< Pointer to the minotaur entity.
     std::list<Item*> items;         ///< List of pointers to items present in the labyrinth.
     int numItems;                   ///< Number of items to spawn in the labyrinth.
+    uint64_t game_init_time = 0;  ///< Time taken to initialize the game in milliseconds.
 
     // Logger object to log game events
     Logger logger;
@@ -46,15 +47,17 @@ private:
     // Game initialization methods
 
     /**
-     * @brief Initializes the game components including the labyrinth, player, minotaur, and items.
+     * @brief Initializes the game components with quiet mode option.
      * 
      * @param width The width of the labyrinth.
      * @param height The height of the labyrinth.
+     * @param quiet Whether to enable quiet mode for the labyrinth.
+     * @param exitOnFailure Whether to exit the program on map generation failure (default: true).
      * 
      * @details 
-     * Sets up the labyrinth grid, checks for successful generation, and initializes the player and minotaur entities.
+     * Sets up the labyrinth grid with quiet mode, checks for successful generation, and initializes the player and minotaur entities.
      */
-    void init(unsigned int width, unsigned int height);
+    void init(unsigned int width, unsigned int height, bool quiet, bool exitOnFailure = true);
 
     /**
      * @brief Spawns the player, minotaur, and randomly places items in the labyrinth.
@@ -171,11 +174,90 @@ public:
      * @param width The width of the labyrinth.
      * @param height The height of the labyrinth.
      * @param numItems The number of items to spawn in the labyrinth.
+     * @param startGame Whether to automatically start the game loop (default: true for backward compatibility).
      * 
      * @details 
-     * Initializes the game by setting up the labyrinth, spawning entities, and starting the game loop.
+     * Initializes the game by setting up the labyrinth, spawning entities. If startGame is true, starts the game loop.
      */
-    Game(unsigned int width, unsigned int height, unsigned int numItems);
+    Game(unsigned int width, unsigned int height, unsigned int numItems, bool startGame = true);
+
+    /**
+     * @brief Constructs a Game object with specified dimensions, items count, game start flag, and quiet mode.
+     * 
+     * @param width The width of the labyrinth.
+     * @param height The height of the labyrinth.
+     * @param numItems The number of items to spawn in the labyrinth.
+     * @param startGame Whether to automatically start the game loop.
+     * @param quiet Whether to enable quiet mode for the labyrinth.
+     * 
+     * @details 
+     * Initializes the game by setting up the labyrinth with quiet mode, spawning entities. If startGame is true, starts the game loop.
+     */
+    Game(unsigned int width, unsigned int height, unsigned int numItems, bool startGame, bool quiet);
+
+    /**
+     * @brief Constructs a Game object for testing with non-exit behavior on map generation failure.
+     * 
+     * @param width The width of the labyrinth.
+     * @param height The height of the labyrinth.
+     * @param numItems The number of items to spawn in the labyrinth.
+     * @param startGame Whether to automatically start the game loop.
+     * @param quiet Whether to enable quiet mode for the labyrinth.
+     * @param exitOnFailure Whether to exit on map generation failure.
+     * 
+     * @details 
+     * Initializes the game by setting up the labyrinth with quiet mode and exit behavior control, spawning entities. If startGame is true, starts the game loop.
+     */
+    Game(unsigned int width, unsigned int height, unsigned int numItems, bool startGame, bool quiet, bool exitOnFailure);
+
+    /**
+     * @brief Starts the game loop if not already started.
+     * 
+     * @details 
+     * This method can be called to explicitly start the game loop after construction.
+     * Useful for testing scenarios where you want to set up the game without immediately starting.
+     */
+    void start();
+
+    /**
+     * @brief Gets the current labyrinth instance.
+     * 
+     * @return Pointer to the labyrinth object.
+     * 
+     * @details 
+     * Provides access to the labyrinth for testing purposes.
+     */
+    Labyrinth* getLabyrinth() const;
+
+    /**
+     * @brief Gets the current player instance.
+     * 
+     * @return Pointer to the player object.
+     * 
+     * @details 
+     * Provides access to the player for testing purposes.
+     */
+    Player* getPlayer() const;
+
+    /**
+     * @brief Gets the current minotaur instance.
+     * 
+     * @return Pointer to the minotaur object.
+     * 
+     * @details 
+     * Provides access to the minotaur for testing purposes.
+     */
+    Minotaur* getMinotaur() const;
+
+    /**
+     * @brief Checks if the labyrinth was successfully generated.
+     * 
+     * @return true if labyrinth generation was successful, false otherwise.
+     * 
+     * @details 
+     * Useful for testing to verify that the game initialization was successful.
+     */
+    bool isLabyrinthGenerated() const;
 
     /**
      * @brief Destructor for the Game class.

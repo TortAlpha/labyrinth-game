@@ -31,6 +31,10 @@ private:
 
     std::list<Cell*> pathFromEntranceToExit;  ///< List of cells representing the path from entrance to exit.
     
+    bool quietMode = false;                   ///< Flag to suppress debug output during tests
+    
+    uint64_t generation_time = 0;                  ///< Time taken to generate the labyrinth in milliseconds
+
     /**
      * @brief Finds a path from the entrance to the exit using BFS.
      * 
@@ -95,6 +99,15 @@ public:
      * Initializes the labyrinth with specified dimensions and generates the map.
      */
     Labyrinth(unsigned int width, unsigned int height);
+
+    /**
+     * @brief Constructs a Labyrinth object with the specified width, height and quiet mode.
+     * 
+     * @param w The width of the labyrinth.
+     * @param h The height of the labyrinth.
+     * @param quiet Whether to suppress debug output.
+     */
+    Labyrinth(unsigned int w, unsigned int h, bool quiet);
     
     /**
      * @brief Destructor for the Labyrinth class.
@@ -198,6 +211,20 @@ public:
      * @return bool True if generation was successful, false otherwise.
      */
     bool getMapGenerationSuccess();
+
+    /**
+     * @brief Sets quiet mode to suppress debug output during tests.
+     * 
+     * @param quiet If true, disables debug output; if false, enables it.
+     */
+    void setQuietMode(bool quiet);
+
+    /**
+     * @brief Retrieves the time taken to generate the labyrinth.
+     * 
+     * @return uint64_t The generation time in milliseconds.
+     */
+    uint64_t getGenerationTime() const;
 
     /**
      * @brief Retrieves the path from the entrance to the exit.

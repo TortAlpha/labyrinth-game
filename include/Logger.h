@@ -51,6 +51,14 @@ class Logger {
          * @param message The message to be logged.
          */
         void log(const std::string& message);
+
+        /**
+         * @brief Logs a message to the log file without a timestamp.
+         * 
+         * @param message The message to be logged.
+         */
+        void save(const std::string& message);
+
 };
 
 #endif // LOGGER_H

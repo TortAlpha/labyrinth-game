@@ -9,6 +9,7 @@
 #include <fstream>
 #include <list>
 #include <termcolor.hpp>
+#include <chrono>
 
 // Returns an integer in [0..max-1]
 static int randomInt(int max) {
@@ -33,12 +34,14 @@ static int randomBool(double p) {
  * If successful, it finds a path from the entrance to the exit.
  */
 Labyrinth::Labyrinth(unsigned int w, unsigned int h)
-    : width(w), height(h)
+    : width(w), height(h), quietMode(false)
 {
     srand(static_cast<unsigned>(time(nullptr)));
 
-    std::cout << "Memory allocation for labyrinth "
-              << width << " x " << height << "...\n";
+    if (!quietMode) {
+        std::cout << "Memory allocation for labyrinth "
+                  << width << " x " << height << "...\n";
+    }
 
     labyrinth = new Cell*[height];
     for (unsigned int row = 0; row < height; row++) {
@@ -49,8 +52,61 @@ Labyrinth::Labyrinth(unsigned int w, unsigned int h)
         }
     }
 
-    std::cout << "Memory allocated.\n";
+    if (!quietMode) {
+        std::cout << "Memory allocated.\n";
+    }
+    
+    // Measure labyrinth generation time
+    auto start = std::chrono::high_resolution_clock::now();
     mapGeneratedSuccessfully = generate();
+    auto end = std::chrono::high_resolution_clock::now();
+    generation_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    
+    if (mapGeneratedSuccessfully) {
+        pathFromEntranceToExit = findPathFromEntranceToExit();
+    }
+}
+
+/**
+ * @brief Constructs a Labyrinth object with the specified width, height, and quiet mode.
+ * 
+ * @param w The width of the labyrinth.
+ * @param h The height of the labyrinth.
+ * @param quiet If true, enables quiet mode (suppressing output messages).
+ * 
+ * @details 
+ * Initializes the labyrinth grid, sets all cells to walls ('#'), and attempts to generate a valid map.
+ * If successful, it finds a path from the entrance to the exit.
+ */
+Labyrinth::Labyrinth(unsigned int w, unsigned int h, bool quiet)
+    : width(w), height(h), quietMode(quiet)
+{
+    srand(static_cast<unsigned>(time(nullptr)));
+
+    if (!quietMode) {
+        std::cout << "Memory allocation for labyrinth "
+                  << width << " x " << height << "...\n";
+    }
+
+    labyrinth = new Cell*[height];
+    for (unsigned int row = 0; row < height; row++) {
+        labyrinth[row] = new Cell[width];
+        for (unsigned int col = 0; col < width; col++) {
+            // By default, set everything to '#'
+            labyrinth[row][col] = Cell(row, col, '#');
+        }
+    }
+
+    if (!quietMode) {
+        std::cout << "Memory allocated.\n";
+    }
+
+    // Measure labyrinth generation time
+    auto start = std::chrono::high_resolution_clock::now();
+    mapGeneratedSuccessfully = generate();
+    auto end = std::chrono::high_resolution_clock::now();
+    generation_time = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    
     if (mapGeneratedSuccessfully) {
         pathFromEntranceToExit = findPathFromEntranceToExit();
     }
@@ -349,27 +405,37 @@ bool Labyrinth::generate()
         unsigned int endCol = exitCol;
 
         if (!isPathExists(startRow, startCol, endRow, endCol)) {
-            std::cout << "No path from U to I on attempt "
-                      << attempt << " / " << MAX_ATTEMPTS << ". Retrying...\n";
+            if (!quietMode) {
+                std::cout << "No path from U to I on attempt "
+                          << attempt << " / " << MAX_ATTEMPTS << ". Retrying...\n";
+            }
         } else {
-            std::cout << "Path from U to I found on attempt "
-                      << attempt << ".\n";
+            if (!quietMode) {
+                std::cout << "Path from U to I found on attempt "
+                          << attempt << ".\n";
+            }
             success = true;
 
             if (!wallCondition()) {
-                std::cout << "Wall condition not met, retrying...\n";
+                if (!quietMode) {
+                    std::cout << "Wall condition not met, retrying...\n";
+                }
                 success = false;
             } else {
-                std::cout << "Wall condition met.\n";
-                std::cout << termcolor::green << "Labyrinth generated successfully.\n" << termcolor::reset;
+                if (!quietMode) {
+                    std::cout << "Wall condition met.\n";
+                    std::cout << termcolor::green << "Labyrinth generated successfully.\n" << termcolor::reset;
+                }
             }
         }
 
     } // end attempts
 
     if (!success) {
-        std::cout << "Too many attempts, giving up.\n";
-        std::cout << termcolor::red << "Labyrinth generation failed.\n" << termcolor::reset;
+        if (!quietMode) {
+            std::cout << "Too many attempts, giving up.\n";
+            std::cout << termcolor::red << "Labyrinth generation failed.\n" << termcolor::reset;
+        }
     }
 
     // Find a path from 'U' to 'I' and store it in pathFromEntranceToExit
@@ -505,6 +571,11 @@ unsigned int Labyrinth::getHeight()
     return this->height;
 }
 
+uint64_t Labyrinth::getGenerationTime() const
+{
+    return this->generation_time;
+}
+
 //------------------------------------------------------------------------------
 // BFS: find a path from entrance 'U' to exit 'I'
 //------------------------------------------------------------------------------
@@ -598,4 +669,9 @@ Cell Labyrinth::getEndPoint()
 std::list<Cell*> Labyrinth::getPathFromEntranceToExit()
 {
     return this->pathFromEntranceToExit;
+}
+
+void Labyrinth::setQuietMode(bool quiet)
+{
+    this->quietMode = quiet;
 }
